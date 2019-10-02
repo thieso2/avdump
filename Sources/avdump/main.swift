@@ -20,31 +20,29 @@ func copy(source: String) throws {
     
     //let ofmtCtx = try! AVFormatContext(url: "/tmp/movie.mov", format: nil, options: ["frag_duration": "1"])
     
-    ofmtCtx.flags = .flushPackets
+//    ofmtCtx.flags = .flushPackets
     guard let ostream = ofmtCtx.addStream() else {
         fatalError("Failed allocating output stream.")
     }
     
-    let codec = AVCodec.findEncoderByName("hevc_videotoolbox")
-    let codecCtx = AVCodecContext(codec: codec)
+//    let codec = AVCodec.findEncoderByName("hevc_videotoolbox")
+//    let codecCtx = AVCodecContext(codec: codec)
     
     
-    var codecParams = istream
+//    var codecParams = istream
     
     ostream.codecParameters.copy(from: istream.codecParameters)
-    ostream.timebase = istream.timebase
-    ostream.averageFramerate = istream.averageFramerate
+//    ostream.timebase = istream.timebase
+//    ostream.averageFramerate = istream.averageFramerate
     //ostream.averageFramerate = istream.averageFramerate
     //ostream.codecParameters.codecTag = 0
     
-    ofmtCtx.dumpFormat(url: output, isOutput: true)
+//    ofmtCtx.dumpFormat(url: output, isOutput: true)
     
-    if !ofmtCtx.outputFormat!.flags.contains(.noFile) {
-        try ofmtCtx.openOutput(url: output, flags: .write)
-    }
-    
+    try ofmtCtx.openOutput(url: output, flags: .write)
+//
     try ofmtCtx.writeHeader(options: ["frag_duration": "1"])
-    //try ofmtCtx.writeHeader()
+//    try ofmtCtx.writeHeader()
     
     let pkt = AVPacket()
     var no = 0
@@ -54,14 +52,14 @@ func copy(source: String) throws {
         
         guard pkt.streamIndex == istream.index else { continue }
         
-        if no % 100 == 0 {
+//        if no % 100 == 0 {
             print(no, pkt.pts, pkt.position, pkt.dts, pkt.duration, pkt.size, pkt.flags)
-        }
+//        }
         
         pkt.position = -1
         
         try ofmtCtx.writeFrame(pkt)
-        //    try ofmtCtx.writeFrame(nil)
+        try ofmtCtx.writeFrame(nil)
         
         no += 1
     }
@@ -112,4 +110,4 @@ func dump_file(path: String) throws {
 
 //AVLog.level = AVLog.Level.error
 
-try dump_file(path: CommandLine.arguments[1])
+try copy(source: "/tmp/source.mov")
